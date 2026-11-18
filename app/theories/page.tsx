@@ -21,7 +21,7 @@ export default function TheoriesPage() {
           <p className={styles.eyebrow}>Knowledge / 04</p>
           <h1>Mind-Bending<br/>Theories</h1>
           <p className={styles.introCopy}>Explore the paradoxes, illusions, and terrifying possibilities that define our modern understanding of the cosmos.</p>
-          <Link className="enter-button section-link" href="/"><ArrowLeft size={15} /> Return to atlas</Link>
+          <Link className="enter-button section-link" href="/"><ArrowLeft size={15} /> Return to Cosmyth</Link>
           <div className={styles.scrollHint}><ArrowDown size={20} /></div>
         </header>
 

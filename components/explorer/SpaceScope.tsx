@@ -28,13 +28,14 @@ export function SpaceScope() {
   const [resetSignal, setResetSignal] = useState(0);
   const [time, setTime] = useState(22);
   const [showIntro, setShowIntro] = useState(true);
+  const [isTransitioning, setIsTransitioning] = useState(false);
   const [returning, setReturning] = useState(false);
   const objects = mode === "solar" ? solarObjects : deepObjects;
   const selected = objects.find((object) => object.id === selectedId);
   const filtered = useMemo(() => objects.filter((object) => `${object.name} ${object.category}`.toLowerCase().includes(query.toLowerCase())), [objects, query]);
 
   useEffect(() => {
-    if (window.localStorage.getItem("orbital-atlas-entered") === "true") setShowIntro(false);
+    if (window.localStorage.getItem("cosmyth-entered") === "true") setShowIntro(false);
   }, []);
 
   function switchMode(nextMode: UniverseMode) {
@@ -49,20 +50,27 @@ export function SpaceScope() {
     router.push(`${pathname}?mode=${mode}`);
   }
 
-  function enterAtlas() { window.localStorage.setItem("orbital-atlas-entered", "true"); setShowIntro(false); }
+  function enterAtlas() { 
+    window.localStorage.setItem("cosmyth-entered", "true"); 
+    setShowIntro(false); 
+    setTimeout(() => setIsTransitioning(false), 2000);
+  }
+  function startTransition() {
+    setIsTransitioning(true);
+  }
   function returnToOrigin() {
     setReturning(true);
     window.setTimeout(() => {
-      window.localStorage.removeItem("orbital-atlas-entered");
+      window.localStorage.removeItem("cosmyth-entered");
       setShowIntro(true);
       setReturning(false);
       clearSelect();
     }, 850);
   }
 
-  return <>{showIntro && <BlackHoleIntro onEnter={enterAtlas} returning={returning} />}<main className={`scope-shell ${showIntro ? "scope-locked" : "scope-awake"} ${returning ? "scope-exiting" : ""}`}>
-    <div className="scope-stage"><UniverseCanvas mode={mode} objects={objects} selectedId={selectedId} onSelect={(object) => handleSelect(object.id)} zoomSignal={zoomSignal} resetSignal={resetSignal} /></div>
-    <header className="scope-header"><button className="scope-logo" onClick={returnToOrigin} aria-label="Return to Orbital Atlas origin"><span><Sparkles size={15} /></span><strong>ORBITAL<br /><em>ATLAS</em></strong></button><div className="scope-mode"><button className={mode === "solar" ? "active" : ""} onClick={() => switchMode("solar")}>Solar system</button><button className={mode === "deep" ? "active" : ""} onClick={() => switchMode("deep")}>Deep universe</button></div><div className="scope-header-actions"><button className="return-link" onClick={returnToOrigin} aria-label="Return to wormhole"><Orbit size={15} /> <span>Wormhole</span></button><button aria-label="Toggle fullscreen" onClick={() => document.documentElement.requestFullscreen?.()}><Maximize size={17} /></button><button className="scope-live"><i /> Live model</button></div></header>
+  return <>{showIntro && <BlackHoleIntro onEnter={enterAtlas} onTransitionStart={startTransition} returning={returning} />}<main className={`scope-shell ${showIntro ? "scope-locked" : "scope-awake"} ${returning ? "scope-exiting" : ""}`}>
+    <div className="scope-stage"><UniverseCanvas mode={mode} objects={objects} selectedId={selectedId} onSelect={(object) => object ? handleSelect(object.id) : clearSelect()} zoomSignal={zoomSignal} resetSignal={resetSignal} isLocked={showIntro} isTransitioning={isTransitioning} /></div>
+    <header className="scope-header"><button className="scope-logo" onClick={returnToOrigin} aria-label="Return to Cosmyth origin"><span><Sparkles size={15} /></span><strong>COS<br /><em>MYTH</em></strong></button><div className="scope-mode"><button className={mode === "solar" ? "active" : ""} onClick={() => switchMode("solar")}>Solar system</button><button className={mode === "deep" ? "active" : ""} onClick={() => switchMode("deep")}>Deep universe</button></div><div className="scope-header-actions"><button className="return-link" onClick={returnToOrigin} aria-label="Return to wormhole"><Orbit size={15} /> <span>Wormhole</span></button><button aria-label="Toggle fullscreen" onClick={() => document.documentElement.requestFullscreen?.()}><Maximize size={17} /></button><button className="scope-live"><i /> Live model</button></div></header>
     <aside className="scope-left-rail">
       <button className="scope-tool active" aria-label="Explore" title="Explore" onClick={() => setTourOpen(true)}><Compass size={18} /></button>
       <button className="scope-tool" aria-label="Object layers" title="Object layers" onClick={() => setTourOpen(true)}><Layers3 size={18} /></button>
@@ -72,7 +80,7 @@ export function SpaceScope() {
       <Link href="/missions" className="scope-tool" aria-label="Missions" title="Missions"><Info size={18} /></Link>
     </aside>
     <div className="scope-search"><Search size={15} /><input value={query} onChange={(event) => setQuery(event.target.value)} placeholder="Search the universe" aria-label="Search the universe" />{query && <button onClick={() => setQuery("")} aria-label="Clear search"><X size={14} /></button>} {query && <div className="search-results">{filtered.map((object) => <button key={object.id} onClick={() => { handleSelect(object.id); setQuery(""); }}>{object.name}<small>{object.category}</small></button>)}</div>}</div>
-    {tourOpen && <aside className="tour-panel"><div className="panel-heading"><div><span>Interactive atlas / {mode === "solar" ? "01" : "04"}</span><h1>{mode === "solar" ? "Solar system" : "Deep universe"}</h1></div><button onClick={() => setTourOpen(false)} aria-label="Close tour panel"><X size={16} /></button></div><p className="panel-intro">{mode === "solar" ? "Drag to orbit. Scroll to travel. Select a world to bring it closer." : "A field guide to the objects that make the dark feel alive."}</p><div className="tour-list">{objects.map((object, index) => <button key={object.id} className={selectedId === object.id ? "selected" : ""} onClick={() => handleSelect(object.id)}><span className="tour-index">0{index + 1}</span><span className="tour-object"><i style={{ background: object.color }} />{object.name}<small>{object.category} · {object.distance}</small></span><span className="tour-arrow">↗</span></button>)}</div></aside>}
+    {tourOpen && <aside className="tour-panel"><div className="panel-heading"><div><span>Cosmyth / {mode === "solar" ? "01" : "04"}</span><h1>{mode === "solar" ? "Solar system" : "Deep universe"}</h1></div><button onClick={() => setTourOpen(false)} aria-label="Close tour panel"><X size={16} /></button></div><p className="panel-intro">{mode === "solar" ? "Drag to orbit. Scroll to travel. Select a world to bring it closer." : "A field guide to the objects that make the dark feel alive."}</p><div className="tour-list">{objects.map((object, index) => <button key={object.id} className={selectedId === object.id ? "selected" : ""} onClick={() => handleSelect(object.id)}><span className="tour-index">0{index + 1}</span><span className="tour-object"><i style={{ background: object.color }} />{object.name}<small>{object.category} · {object.distance}</small></span><span className="tour-arrow">↗</span></button>)}</div></aside>}
     {selected && <aside className="object-card"><div className="object-card-top"><span>{selected.category}</span><button aria-label="Close information" onClick={clearSelect}><X size={14} /></button></div><div className="object-title"><i style={{ background: selected.color, boxShadow: `0 0 28px ${selected.color}` }} /><div><h2>{selected.name}</h2><span>{selected.detail}</span></div></div><p>{selected.description}</p><div className="object-facts">{selected.facts.map((fact) => <span key={fact}>{fact}</span>)}</div><div className="object-distance"><span>Distance from Earth</span><strong>{selected.distance}</strong></div>{selected.travelTime && <div className="object-distance"><span>Travel Time (Light Speed)</span><strong>{selected.travelTime}</strong></div>}<button className="focus-object" onClick={() => setTourOpen(false)}><Crosshair size={14} /> Focus object</button></aside>}
     {!selected && !tourOpen && <div className="discover-hint"><span>01</span><strong>Choose a world to begin</strong><small>Drag with your touchpad to look · scroll to travel · click any glowing object</small></div>}
     {!showIntro && <WormholeGateway onReturn={returnToOrigin} />}
