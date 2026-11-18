@@ -10,6 +10,7 @@ export function SiteHeader({ active = "Explore" }: { active?: string }) {
       </Link>
       <nav className="main-nav" aria-label="Primary navigation">
         <Link className={active === "Explore" ? "active" : ""} href="/">Explore</Link>
+        <Link className={active === "Theories" ? "active" : ""} href="/theories">Theories</Link>
         <Link className={active === "Missions" ? "active" : ""} href="/missions">Missions</Link>
         <Link className={active === "Observatory" ? "active" : ""} href="/observatory">Observatory</Link>
       </nav>

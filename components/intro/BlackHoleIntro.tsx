@@ -1,6 +1,7 @@
 "use client";
 
-import { ArrowRight, Orbit } from "lucide-react";
+import { ArrowRight, BookOpen, Orbit } from "lucide-react";
+import Link from "next/link";
 import { useState } from "react";
 
 export function BlackHoleIntro({ onEnter, onTransitionStart, returning = false }: { onEnter: () => void; onTransitionStart?: () => void; returning?: boolean }) {
@@ -32,8 +33,13 @@ export function BlackHoleIntro({ onEnter, onTransitionStart, returning = false }
         <p className="intro-kicker">{returning ? "The edge between worlds" : "A living map of our cosmic neighborhood"}</p>
         <h1>{returning ? <>Find your way<br /><em>back home.</em></> : <>Fall beyond<br /><em>the familiar.</em></>}</h1>
         <p className="intro-description">{returning ? "The universe is still out there. The wormhole is the thread back to the beginning." : "There is more to space than a screen can hold. Enter Cosmyth and let gravity pull you through it."}</p>
-        <button className="enter-button" onClick={enterAtlas}>{returning ? "Return to the origin" : "Enter Cosmyth"} <ArrowRight size={17} /></button>
-        <span className="intro-hint">{returning ? "Cross the event horizon to leave" : "Click anywhere inside the event horizon"}</span>
+        <div style={{ display: 'flex', gap: '10px', alignItems: 'center', flexWrap: 'wrap', marginTop: '4px' }}>
+          <button className="enter-button" onClick={enterAtlas}>{returning ? "Return to the origin" : "Enter Cosmyth"} <ArrowRight size={17} /></button>
+          <Link href="/theories" className="enter-button" style={{ background: 'rgba(126, 230, 224, 0.08)', borderColor: 'rgba(126, 230, 224, 0.3)', color: '#7ee6e0', textDecoration: 'none' }}>
+            <BookOpen size={15} /> 36 Theories
+          </Link>
+        </div>
+        <span className="intro-hint">{returning ? "Cross the event horizon to leave" : "Click anywhere inside the event horizon or explore theories"}</span>
       </div>
       <div 
         className="black-hole-wrapper"
